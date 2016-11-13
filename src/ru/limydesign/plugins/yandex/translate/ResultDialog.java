@@ -1,8 +1,5 @@
 package ru.limydesign.plugins.yandex.translate;
 
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.editor.Editor;
-
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -23,9 +20,13 @@ public final class ResultDialog extends JFrame {
     private JEditorPane paneTranslated;
     private JLabel labelCopy;
 
+    private OnReplaceListener listener;
+
     private ResultDialog() throws URISyntaxException {
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonReplace);
+
+//        setIconImage(new ImageIcon(getClass().getResource("res/icon.png")).getImage());
 
         final URI uri = new URI("http://translate.yandex.ru/");
         labelCopy.setToolTipText(uri.toString());
@@ -103,10 +104,10 @@ public final class ResultDialog extends JFrame {
     }
 
     private void onReplace() {
-        String tranlatedText;
+        final String tranlatedText;
         try {
             tranlatedText = getTranslatedText();
-            //TODO: как отсюда заменить выделенный текст в редакторе???
+            listener.onReplace(tranlatedText);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
