@@ -2,53 +2,44 @@ package ru.limydesign.plugins.yandex.translate;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 
-import java.net.URISyntaxException;
+import java.util.prefs.Preferences;
 
 /**
  * Created by Arsen Bespalov on 12.11.2016.
  * Получает выделенный текст, открывается диалогвое окно переводчика и автоматически переводит.
  */
-//public class YandexTranslateAction extends AnAction implements OnReplaceListener {
 public class YandexTranslateAction extends AnAction {
-
-    private Editor editor;
-
     @Override
     public void actionPerformed(AnActionEvent e) {
         Editor data = PlatformDataKeys.EDITOR.getData(e.getDataContext());
+        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
         if (data != null) {
-            this.editor = data;
             final String selectedText = data.getSelectionModel().getSelectedText();
             if (selectedText != null && selectedText.length() > 0) {
                 final String splitedText = Splitter.split(selectedText);
                 ResultDialog dialog;
+                Preferences preferences;
                 try {
-                    dialog = ResultDialog.createDialog("Яндекс.Переводчик", data);
+                    preferences = Preferences.userNodeForPackage(ru.limydesign.plugins.yandex.translate.ResultDialog.class);
+                    String langFrom = preferences.get("langFrom", "русский");
+                    String langTo = preferences.get("langTo", "английский");
+
+                    dialog = ResultDialog.createDialog("Яндекс.Переводчик", data, project);
 
                     dialog.setSelectedText(splitedText);
-                    dialog.setFromLangBox("русский");
-                    dialog.setToLangBox("английский");
+                    dialog.setFromLangBox(langFrom);
+                    dialog.setToLangBox(langTo);
 
                     dialog.onOK();
-                } catch (URISyntaxException e1) {
+                } catch (Exception e1) {
                     e1.printStackTrace();
                 }
             }
         }
     }
-
-//    @Override
-//    public void onReplace(String text) {
-//        int start = editor.getSelectionModel().getSelectionStart();
-//        int end = editor.getSelectionModel().getSelectionEnd();
-//        Runnable runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                editor.getDocument().replaceString(start, end, text);
-//            }
-//        };
-//    }
 }
