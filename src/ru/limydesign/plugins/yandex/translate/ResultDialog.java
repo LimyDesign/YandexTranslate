@@ -1,6 +1,8 @@
 package ru.limydesign.plugins.yandex.translate;
 
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -9,6 +11,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.prefs.Preferences;
 
 public final class ResultDialog extends JFrame {
     private JPanel contentPane;
@@ -22,14 +25,15 @@ public final class ResultDialog extends JFrame {
     private JEditorPane paneTranslated;
     private JLabel labelCopy;
 
-//    private OnReplaceListener listener;
     private Editor editor;
+    private Project project;
+    private Preferences preferences;
 
     private ResultDialog() throws URISyntaxException {
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonReplace);
 
-//        setIconImage(new ImageIcon(getClass().getResource("res/icon.png")).getImage());
+        setIconImage(new ImageIcon("/icons/yandex_translate.png").getImage());
 
         final URI uri = new URI("http://translate.yandex.ru/");
         labelCopy.setToolTipText(uri.toString());
@@ -61,34 +65,18 @@ public final class ResultDialog extends JFrame {
             }
         });
 
-        buttonSwap.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int from = comboBoxFrom.getSelectedIndex();
-                int to = comboBoxTo.getSelectedIndex();
-                comboBoxFrom.setSelectedIndex(to);
-                comboBoxTo.setSelectedIndex(from);
-            }
+        buttonSwap.addActionListener(e -> {
+            int from = comboBoxFrom.getSelectedIndex();
+            int to = comboBoxTo.getSelectedIndex();
+            comboBoxFrom.setSelectedIndex(to);
+            comboBoxTo.setSelectedIndex(from);
         });
 
-        buttonReplace.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onReplace();
-            }
-        });
+        buttonReplace.addActionListener(e -> onReplace());
 
-        buttonOK.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOK();
-            }
-        });
+        buttonOK.addActionListener(e -> onOK());
 
-        buttonCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        });
+        buttonCancel.addActionListener(e -> onCancel());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -99,11 +87,7 @@ public final class ResultDialog extends JFrame {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCancel();
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     /**
@@ -115,13 +99,8 @@ public final class ResultDialog extends JFrame {
             tranlatedText = getTranslatedText();
             int start = editor.getSelectionModel().getSelectionStart();
             int end = editor.getSelectionModel().getSelectionEnd();
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    editor.getDocument().replaceString(start, end, tranlatedText);
-                }
-            };
-//            listener.onReplace(tranlatedText);
+            Runnable runnable = () -> editor.getDocument().replaceString(start, end, tranlatedText);
+            WriteCommandAction.runWriteCommandAction(project, runnable);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -140,6 +119,10 @@ public final class ResultDialog extends JFrame {
 
             String selectedText = getSelectedText();
             translatedText = YandexTranslateClient.translate(selectedText, langPair);
+
+            preferences = Preferences.userNodeForPackage(ru.limydesign.plugins.yandex.translate.ResultDialog.class);
+            preferences.put("langFrom", from);
+            preferences.put("langTo", to);
         } catch (Exception e) {
             translatedText = e.getMessage();
         }
@@ -160,13 +143,15 @@ public final class ResultDialog extends JFrame {
      * @return ResultDialog
      * @throws URISyntaxException Возвращает ошибку в случае неправильных запросов в Languages.
      */
-    static ResultDialog createDialog(final String title, Editor editor) throws URISyntaxException {
+    static ResultDialog createDialog(final String title, Editor editor, Project project) throws URISyntaxException {
         ResultDialog dialog = new ResultDialog();
         dialog.setTitle(title);
-        if (editor != null)
+        if (editor != null && project != null) {
             dialog.setEditor(editor);
-        else
+            dialog.setProject(project);
+        } else {
             dialog.buttonReplace.setEnabled(false);
+        }
 
         for (String s : Languages.getLangs()) {
             dialog.comboBoxFrom.addItem(s);
@@ -178,6 +163,10 @@ public final class ResultDialog extends JFrame {
         dialog.setVisible(true);
 
         return dialog;
+    }
+
+    private void setProject(Project project) {
+        this.project = project;
     }
 
     private void setEditor(Editor editor) {
@@ -198,15 +187,15 @@ public final class ResultDialog extends JFrame {
         paneTranslated.setText(s);
     }
 
-    public void setSelectedText(final String s) {
+    void setSelectedText(final String s) {
         paneSelected.setText(s);
     }
 
-    public void setFromLangBox(final String s) {
+    void setFromLangBox(final String s) {
         this.comboBoxFrom.setSelectedItem(s);
     }
 
-    public void setToLangBox(final String s) {
+    void setToLangBox(final String s) {
         this.comboBoxTo.setSelectedItem(s);
     }
 
