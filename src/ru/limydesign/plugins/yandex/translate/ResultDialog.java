@@ -67,6 +67,13 @@ public final class ResultDialog extends JFrame {
             }
         });
 
+        buttonReplace.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onReplace();
+            }
+        });
+
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -95,14 +102,15 @@ public final class ResultDialog extends JFrame {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-//    private void onReplace() {
-//        String tranlatedText;
-//        try {
-//            tranlatedText = getTranslatedText();
-//        } catch (BadLocationException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void onReplace() {
+        String tranlatedText;
+        try {
+            tranlatedText = getTranslatedText();
+            //TODO: как отсюда заменить выделенный текст в редакторе???
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void onOK() {
         String translatedText;
