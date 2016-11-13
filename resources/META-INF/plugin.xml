@@ -1,0 +1,41 @@
+<idea-plugin version="2">
+  <id>ru.limydesign.plugins.yandex.translate</id>
+  <name>Yandex Translate</name>
+  <version>0.0.1</version>
+  <vendor email="support@limydesign.ru" url="https://www.limydesign.ru">LimyDesign Studio</vendor>
+
+  <description><![CDATA[
+      Плагин служит для быстрого перевода выделенного текста. Также можно переводить любой введенный текст прямо в
+      отдельном окне.
+    ]]></description>
+
+  <change-notes><![CDATA[
+      Инициализация плагина
+    ]]>
+  </change-notes>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="PS-145"/>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <depends>com.intellij.modules.xml</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <!-- Add your actions here -->
+    <action id="TranslateSelected" class="ru.limydesign.plugins.yandex.translate.YandexTranslateAction"
+            text="Перевести с помощью Яндекс.Переводчик">
+      <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+    </action>
+    <action class="ru.limydesign.plugins.yandex.translate.YandexTranslateDialog" id="OpenDialog"
+            text="Яндекс.Переводчик">
+      <add-to-group group-id="ToolsMenu" anchor="first"/>
+    </action>
+  </actions>
+</idea-plugin>
