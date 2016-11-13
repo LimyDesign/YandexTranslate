@@ -3,7 +3,7 @@ package ru.limydesign.plugins.yandex.translate;
 /**
  * Created by Arsen Bespalov on 12.11.2016.
  */
-public class Splitter {
+class Splitter {
 
     static String split(final String text) {
         String splitedString = splitDollar(text);

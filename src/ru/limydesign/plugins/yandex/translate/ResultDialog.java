@@ -1,5 +1,7 @@
 package ru.limydesign.plugins.yandex.translate;
 
+import com.intellij.openapi.editor.Editor;
+
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -20,7 +22,8 @@ public final class ResultDialog extends JFrame {
     private JEditorPane paneTranslated;
     private JLabel labelCopy;
 
-    private OnReplaceListener listener;
+//    private OnReplaceListener listener;
+    private Editor editor;
 
     private ResultDialog() throws URISyntaxException {
         setContentPane(contentPane);
@@ -103,17 +106,31 @@ public final class ResultDialog extends JFrame {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
+    /**
+     * Заменяет выделенный в редакторе текст переведенным.
+     */
     private void onReplace() {
         final String tranlatedText;
         try {
             tranlatedText = getTranslatedText();
-            listener.onReplace(tranlatedText);
+            int start = editor.getSelectionModel().getSelectionStart();
+            int end = editor.getSelectionModel().getSelectionEnd();
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    editor.getDocument().replaceString(start, end, tranlatedText);
+                }
+            };
+//            listener.onReplace(tranlatedText);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
     }
 
-    public void onOK() {
+    /**
+     * Выполняет перевод введенного текста.
+     */
+    void onOK() {
         String translatedText;
         try {
             String from = (String) comboBoxFrom.getSelectedItem();
@@ -129,13 +146,27 @@ public final class ResultDialog extends JFrame {
         setTranslatedText(translatedText);
     }
 
+    /**
+     * Закрывает диалоговое окно переводчика.
+     */
     private void onCancel() {
         dispose();
     }
 
-    public static ResultDialog createDialog(final String title) throws URISyntaxException {
+    /**
+     * Создает диалоговое окно переводчика.
+     *
+     * @param title Заголовок диалогового окна.
+     * @return ResultDialog
+     * @throws URISyntaxException Возвращает ошибку в случае неправильных запросов в Languages.
+     */
+    static ResultDialog createDialog(final String title, Editor editor) throws URISyntaxException {
         ResultDialog dialog = new ResultDialog();
         dialog.setTitle(title);
+        if (editor != null)
+            dialog.setEditor(editor);
+        else
+            dialog.buttonReplace.setEnabled(false);
 
         for (String s : Languages.getLangs()) {
             dialog.comboBoxFrom.addItem(s);
@@ -147,6 +178,10 @@ public final class ResultDialog extends JFrame {
         dialog.setVisible(true);
 
         return dialog;
+    }
+
+    private void setEditor(Editor editor) {
+        this.editor = editor;
     }
 
     private String getSelectedText() throws BadLocationException {

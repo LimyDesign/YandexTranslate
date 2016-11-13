@@ -11,7 +11,8 @@ import java.net.URISyntaxException;
  * Created by Arsen Bespalov on 12.11.2016.
  * Получает выделенный текст, открывается диалогвое окно переводчика и автоматически переводит.
  */
-public class YandexTranslateAction extends AnAction implements OnReplaceListener {
+//public class YandexTranslateAction extends AnAction implements OnReplaceListener {
+public class YandexTranslateAction extends AnAction {
 
     private Editor editor;
 
@@ -25,7 +26,7 @@ public class YandexTranslateAction extends AnAction implements OnReplaceListener
                 final String splitedText = Splitter.split(selectedText);
                 ResultDialog dialog;
                 try {
-                    dialog = ResultDialog.createDialog("Яндекс.Переводчик");
+                    dialog = ResultDialog.createDialog("Яндекс.Переводчик", data);
 
                     dialog.setSelectedText(splitedText);
                     dialog.setFromLangBox("русский");
@@ -39,15 +40,15 @@ public class YandexTranslateAction extends AnAction implements OnReplaceListener
         }
     }
 
-    @Override
-    public void onReplace(String text) {
-        int start = editor.getSelectionModel().getSelectionStart();
-        int end = editor.getSelectionModel().getSelectionEnd();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                editor.getDocument().replaceString(start, end, text);
-            }
-        };
-    }
+//    @Override
+//    public void onReplace(String text) {
+//        int start = editor.getSelectionModel().getSelectionStart();
+//        int end = editor.getSelectionModel().getSelectionEnd();
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                editor.getDocument().replaceString(start, end, text);
+//            }
+//        };
+//    }
 }

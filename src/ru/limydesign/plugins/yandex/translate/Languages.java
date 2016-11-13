@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Created by Arsen Bespalov on 12.11.2016.
  */
-public final class Languages {
+final class Languages {
 
     /**
      * Содержит все ярлыки поддерживаемых языков используемая для создания пары перевода.
@@ -122,7 +122,7 @@ public final class Languages {
         langShortcuts.put("японский", "ja");
     }
 
-    public static String getTranslatePair(final String from, final String to) {
+    static String getTranslatePair(final String from, final String to) {
         final String fromShortcut = langShortcuts.get(from);
         final String toShortcut = langShortcuts.get(to);
 
@@ -135,7 +135,7 @@ public final class Languages {
         return newPair;
     }
 
-    public static List<String> getLangs() {
+    static List<String> getLangs() {
         ArrayList<String> fullLangs = new ArrayList<>(langShortcuts.keySet());
         Collections.sort(fullLangs);
         return fullLangs;

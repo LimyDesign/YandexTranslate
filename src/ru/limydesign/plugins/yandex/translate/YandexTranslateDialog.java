@@ -14,7 +14,7 @@ public class YandexTranslateDialog extends AnAction {
     public void actionPerformed(AnActionEvent e) {
         ResultDialog dialog;
         try {
-            dialog = ResultDialog.createDialog("Яндекс.Переводчик");
+            dialog = ResultDialog.createDialog("Яндекс.Переводчик", null);
             dialog.setFromLangBox("русский");
             dialog.setToLangBox("английский");
         } catch (URISyntaxException e1) {
