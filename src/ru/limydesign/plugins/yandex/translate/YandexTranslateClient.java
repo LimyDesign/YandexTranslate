@@ -79,11 +79,9 @@ class YandexTranslateClient {
 
         final String url = HOST + Method.TRANSLATE + Param.KEY + KEY + Param.LANG_PAIR + langPair + Param.TEXT + encodedText;
         JSONObject json = jsonRequest(url);
-        try {
+        if (json.has("code")) {
             int code = (int)json.get("code");
             isResponseSeccessfull(code);
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         JSONArray langsArray = (JSONArray)json.get("text");
@@ -101,10 +99,9 @@ class YandexTranslateClient {
     static HashMap<String, String> getLangs() throws IOException, YandexTranslateException, JSONException {
         final String url = HOST + Method.GET_LANGS + Param.KEY + KEY + Param.UI + LOCALE.getLanguage();
         JSONObject json = jsonRequest(url);
-        try {
+        if (json.has("code")) {
             int code = (int)json.get("code");
-        } catch (JSONException e) {
-            e.printStackTrace();
+            isResponseSeccessfull(code);
         }
 
         JSONObject langs = (JSONObject)json.get("langs");
@@ -128,12 +125,9 @@ class YandexTranslateClient {
     static Set<String> getLangPairs() throws IOException, YandexTranslateException, JSONException {
         final String url = HOST + Method.GET_LANGS + Param.KEY + KEY + Param.UI + LOCALE.getLanguage();
         JSONObject json = jsonRequest(url);
-
-        try {
+        if (json.has("code")) {
             int code = (int)json.get("code");
             isResponseSeccessfull(code);
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
 
         JSONArray langsArray = (JSONArray)json.get("dirs");

@@ -16,6 +16,8 @@ import java.util.prefs.Preferences;
  * Получает выделенный текст, открывается диалогвое окно переводчика и автоматически переводит.
  */
 public class YandexTranslateAction extends AnAction {
+    private static final ResourceBundle MESS = ResourceBundle.getBundle("Messages", Locale.getDefault());
+
     @Override
     public void actionPerformed(AnActionEvent e) {
         Editor data = PlatformDataKeys.EDITOR.getData(e.getDataContext());
@@ -26,14 +28,12 @@ public class YandexTranslateAction extends AnAction {
                 final String splitedText = Splitter.split(selectedText);
                 ResultDialog dialog;
                 Preferences preferences;
-                Locale currentLocale = Locale.getDefault();
-                ResourceBundle mess = ResourceBundle.getBundle("Messages", currentLocale);
                 try {
                     preferences = Preferences.userNodeForPackage(ru.limydesign.plugins.yandex.translate.ResultDialog.class);
-                    String langFrom = preferences.get("langFrom", mess.getString("langFrom"));
-                    String langTo = preferences.get("langTo", mess.getString("langTo"));
+                    String langFrom = preferences.get("langFrom", MESS.getString("langFrom"));
+                    String langTo = preferences.get("langTo", MESS.getString("langTo"));
 
-                    dialog = ResultDialog.createDialog(mess.getString("title"), data, project);
+                    dialog = ResultDialog.createDialog(MESS.getString("title"), data, project);
 
                     dialog.setSelectedText(splitedText);
                     dialog.setFromLangBox(langFrom);

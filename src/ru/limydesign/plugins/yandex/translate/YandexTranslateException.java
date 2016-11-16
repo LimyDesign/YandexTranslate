@@ -12,8 +12,8 @@ class YandexTranslateException extends Exception {
 
     enum ResponseCode {
         SUCCESS(200, MESS.getString("success")),
-        INVAKID_KEY(401, MESS.getString("invakid_key")),
-        BLOKED_KEY(402, MESS.getString("bloked_key")),
+        INVALID_KEY(401, MESS.getString("invalid_key")),
+        BLOCKED_KEY(402, MESS.getString("blocked_key")),
         TEXT_LIMIT(404, MESS.getString("text_limit")),
         MAX_TEXT(413, MESS.getString("max_text")),
         CANT_TRANSLATE(422, MESS.getString("cant_translate")),

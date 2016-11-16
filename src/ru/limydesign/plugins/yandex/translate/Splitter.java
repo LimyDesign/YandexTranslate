@@ -1,8 +1,5 @@
 package ru.limydesign.plugins.yandex.translate;
 
-/**
- * Created by Arsen Bespalov on 12.11.2016.
- */
 class Splitter {
 
     static String split(final String text) {
