@@ -7,6 +7,8 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 /**
@@ -24,12 +26,14 @@ public class YandexTranslateAction extends AnAction {
                 final String splitedText = Splitter.split(selectedText);
                 ResultDialog dialog;
                 Preferences preferences;
+                Locale currentLocale = Locale.getDefault();
+                ResourceBundle mess = ResourceBundle.getBundle("Messages", currentLocale);
                 try {
                     preferences = Preferences.userNodeForPackage(ru.limydesign.plugins.yandex.translate.ResultDialog.class);
-                    String langFrom = preferences.get("langFrom", "русский");
-                    String langTo = preferences.get("langTo", "английский");
+                    String langFrom = preferences.get("langFrom", mess.getString("langFrom"));
+                    String langTo = preferences.get("langTo", mess.getString("langTo"));
 
-                    dialog = ResultDialog.createDialog("Яндекс.Переводчик", data, project);
+                    dialog = ResultDialog.createDialog(mess.getString("title"), data, project);
 
                     dialog.setSelectedText(splitedText);
                     dialog.setFromLangBox(langFrom);

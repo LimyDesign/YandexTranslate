@@ -1,23 +1,23 @@
 package ru.limydesign.plugins.yandex.translate;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
-/**
- * Created by Arsen Bespalov on 12.11.2016.
- */
-public class YandexTranslateException extends Exception {
+class YandexTranslateException extends Exception {
 
     private final ResponseCode response;
+    private static final ResourceBundle MESS = ResourceBundle.getBundle("Messages", Locale.getDefault());
 
-    public enum ResponseCode {
-        SUCCESS(200, "Операция выполнена успешно"),
-        INVAKID_KEY(401, "Неправильный API-ключ"),
-        BLOKED_KEY(402, "API-ключ заблокирован"),
-        TEXT_LIMIT(404, "Превышено суточное ограничение на объем переведенного текста"),
-        MAX_TEXT(413, "Превышен максимально допустимый размер текста"),
-        CANT_TRANSLATE(422, "Текст не может быть переведен"),
-        INVALID_LANG_PAIR(501, "Заданное направление перевода не поддерживается");
+    enum ResponseCode {
+        SUCCESS(200, MESS.getString("success")),
+        INVAKID_KEY(401, MESS.getString("invakid_key")),
+        BLOKED_KEY(402, MESS.getString("bloked_key")),
+        TEXT_LIMIT(404, MESS.getString("text_limit")),
+        MAX_TEXT(413, MESS.getString("max_text")),
+        CANT_TRANSLATE(422, MESS.getString("cant_translate")),
+        INVALID_LANG_PAIR(501, MESS.getString("invalid_lang_pair"));
 
         final int code;
         final String message;
@@ -44,10 +44,10 @@ public class YandexTranslateException extends Exception {
     YandexTranslateException(int code) {
         ResponseCode response = ResponseCode.getByCode(code);
         if (response == null) {
-            throw new IllegalArgumentException("Нет такого кода в ResponseCode");
+            throw new IllegalArgumentException(MESS.getString("exception_no_code"));
         }
         if (response.code == ResponseCode.SUCCESS.code) {
-            throw new IllegalArgumentException("Exception не могут быть применены к ResponseCode.SUCCESS.code");
+            throw new IllegalArgumentException(MESS.getString("not_exception"));
         }
         this.response = response;
     }

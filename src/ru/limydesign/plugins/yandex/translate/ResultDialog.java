@@ -11,6 +11,8 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 public final class ResultDialog extends JFrame {
@@ -19,15 +21,16 @@ public final class ResultDialog extends JFrame {
     private JButton buttonCancel;
     private JButton buttonSwap;
     private JButton buttonReplace;
-    private JComboBox comboBoxFrom;
-    private JComboBox comboBoxTo;
+    private JComboBox<String> comboBoxFrom;
+    private JComboBox<String> comboBoxTo;
     private JEditorPane paneSelected;
     private JEditorPane paneTranslated;
     private JLabel labelCopy;
 
     private Editor editor;
     private Project project;
-    private Preferences preferences;
+
+    private static ResourceBundle MESS = ResourceBundle.getBundle("Messages", Locale.getDefault());
 
     private ResultDialog() throws URISyntaxException {
         setContentPane(contentPane);
@@ -35,7 +38,7 @@ public final class ResultDialog extends JFrame {
 
         setIconImage(new ImageIcon("/icons/yandex_translate.png").getImage());
 
-        final URI uri = new URI("http://translate.yandex.ru/");
+        final URI uri = new URI(MESS.getString("url"));
         labelCopy.setToolTipText(uri.toString());
         labelCopy.addMouseListener(new MouseListener() {
             @Override
@@ -120,7 +123,7 @@ public final class ResultDialog extends JFrame {
             String selectedText = getSelectedText();
             translatedText = YandexTranslateClient.translate(selectedText, langPair);
 
-            preferences = Preferences.userNodeForPackage(ru.limydesign.plugins.yandex.translate.ResultDialog.class);
+            Preferences preferences = Preferences.userNodeForPackage(ResultDialog.class);
             preferences.put("langFrom", from);
             preferences.put("langTo", to);
         } catch (Exception e) {
@@ -153,10 +156,10 @@ public final class ResultDialog extends JFrame {
             dialog.buttonReplace.setEnabled(false);
         }
 
-        for (String s : Languages.getLangs()) {
+        Languages.getLangs().stream().filter(s -> s != null).forEach(s -> {
             dialog.comboBoxFrom.addItem(s);
             dialog.comboBoxTo.addItem(s);
-        }
+        });
 
         dialog.pack();
         dialog.setMinimumSize(dialog.getSize());
@@ -210,16 +213,14 @@ public final class ResultDialog extends JFrame {
     }
 
     private void enter() {
-        final String text = "<html>Переведено сервисом «Яндекс.Переводчик»</html>";
         Cursor cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
         setCursor(cursor);
-        labelCopy.setText(text);
+        labelCopy.setText(MESS.getString("copy_text_hover"));
     }
 
     private void exit() {
-        final String text = "<html><u>Переведено сервисом «Яндекс.Переводчик»</u></html>";
         Cursor cursor = Cursor.getDefaultCursor();
         setCursor(cursor);
-        labelCopy.setText(text);
+        labelCopy.setText(MESS.getString("copy_text"));
     }
 }

@@ -17,11 +17,12 @@ import java.util.*;
  * Класс {@code YandexTranslateClient} обеспечивает получение поддерживаемых языков для перевода, а также осуществляет
  * процесс запроса на перевод полученного текста.
  */
-public class YandexTranslateClient {
+class YandexTranslateClient {
 
     private static final String HOST = "https://translate.yandex.net/api/v1.5/tr.json/";
     private static final String KEY = "trnsl.1.1.20161112T111353Z.4839808e5938b81e.4bc6f78781eac7daebd3e3403e92407cead8e8e4";
     private static final Locale LOCALE = Locale.getDefault();
+    private static final ResourceBundle MESS = ResourceBundle.getBundle("Messages", LOCALE);
 
     private enum Method {
         TRANSLATE("translate"),
@@ -68,10 +69,10 @@ public class YandexTranslateClient {
      */
     public static String translate(final String text, final String langPair) throws YandexTranslateException, IOException, JSONException {
         if (text == null) {
-            throw new NullPointerException("Отсутсвует текст для перевода.");
+            throw new NullPointerException(MESS.getString("translation_text_null"));
         }
         if (langPair == null) {
-            throw new NullPointerException("Языки перевода не выбраны.");
+            throw new NullPointerException(MESS.getString("lang_pair_null"));
         }
 
         String encodedText = URLEncoder.encode(text, "UTF-8");
@@ -90,33 +91,42 @@ public class YandexTranslateClient {
         return (String) langsArray.get(0);
     }
 
-//    public static Set<String> getLangs() throws IOException, JSONException {
-//        final String url = HOST + Method.GET_LANGS + Param.UI + LOCALE.getLanguage();
-//        JSONObject json = jsonRequest(url);
-//        try {
-//            int code = (int)json.get("code");
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//        JSONArray langsArray = (JSONArray)json.get("langs");
-//        HashMap<String, String> langs = new HashSet<String, String>();
-//        for (int i = 0; i < langsArray.length(); i++) {
-//            langs.add(langsArray.getString(i));
-//        }
-//
-//        return langs;
-//    }
+    /**
+     * Метод получает данный о поддерживаемых языка для соответствующей локали и возвращает подготовленную переменную.
+     *
+     * @return @{code HashMap<String, String>} Значение, ключ
+     * @throws IOException Исключение
+     * @throws JSONException Исключение
+     */
+    static HashMap<String, String> getLangs() throws IOException, YandexTranslateException, JSONException {
+        final String url = HOST + Method.GET_LANGS + Param.KEY + KEY + Param.UI + LOCALE.getLanguage();
+        JSONObject json = jsonRequest(url);
+        try {
+            int code = (int)json.get("code");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject langs = (JSONObject)json.get("langs");
+        HashMap<String, String> langShortcuts = new HashMap<>();
+        Iterator<?> keys = langs.keys();
+        while (keys.hasNext()) {
+            String key = (String)keys.next();
+            String name = (String)langs.get(key);
+            langShortcuts.put(name, key);
+        }
+        return langShortcuts;
+    }
 
     /**
-     * Метод получает список всех доступных языков для перевода.
+     * Метод получает список всех доступных пар языков для перевода.
      *
      * @return возвращает список языков для перевода.
      * @throws IOException Вызывается в случае непредвиденных ошибок.
      * @throws YandexTranslateException Вызывается когда получает ошибку от Яндекс.Переводчика.
      */
-    public static Set<String> getLangPairs() throws IOException, YandexTranslateException, JSONException {
-        final String url = HOST + Method.GET_LANGS + Param.KEY + KEY;
+    static Set<String> getLangPairs() throws IOException, YandexTranslateException, JSONException {
+        final String url = HOST + Method.GET_LANGS + Param.KEY + KEY + Param.UI + LOCALE.getLanguage();
         JSONObject json = jsonRequest(url);
 
         try {
